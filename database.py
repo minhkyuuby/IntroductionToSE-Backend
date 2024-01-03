@@ -1,11 +1,9 @@
 import mysql.connector
 import json
+from config import *
 
 mydb = mysql.connector.connect(
-  host="localhost",
-  user="root",
-  password="",
-  database="managerapartments"
+  **ConfigDatabase
 )
 
 mycursor = mydb.cursor(buffered=True, dictionary=True)
