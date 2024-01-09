@@ -25,6 +25,8 @@ class ServiceCalculate(BaseModel):
 class ServiceInfo(BaseModel):
     eval_price: Union[str, None] = None
     status: Union[int, None] = None
+    price: Union[int, None] = None
+    unit: Union[str, None] = None
     note: Union[str, None] = None
 
 class Service(BaseModel):
