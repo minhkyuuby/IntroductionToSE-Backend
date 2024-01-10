@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Máy chủ: 127.0.0.1
--- Thời gian đã tạo: Th1 10, 2024 lúc 09:30 AM
+-- Thời gian đã tạo: Th1 10, 2024 lúc 09:46 AM
 -- Phiên bản máy phục vụ: 10.4.28-MariaDB
 -- Phiên bản PHP: 8.0.28
 
@@ -91,7 +91,8 @@ CREATE TABLE `temporarycard` (
   `id_people` int(11) NOT NULL,
   `start` datetime NOT NULL,
   `end` datetime NOT NULL,
-  `info` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL CHECK (json_valid(`info`))
+  `info` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL CHECK (json_valid(`info`)),
+  `type` int(2) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
@@ -165,7 +166,8 @@ ALTER TABLE `temporarycard`
   ADD PRIMARY KEY (`id`),
   ADD KEY `start` (`start`),
   ADD KEY `end` (`end`),
-  ADD KEY `id_people` (`id_people`) USING BTREE;
+  ADD KEY `id_people` (`id_people`) USING BTREE,
+  ADD KEY `type` (`type`);
 
 --
 -- Chỉ mục cho bảng `users`
