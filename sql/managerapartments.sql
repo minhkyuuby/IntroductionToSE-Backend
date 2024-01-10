@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Máy chủ: 127.0.0.1
--- Thời gian đã tạo: Th1 03, 2024 lúc 04:04 PM
+-- Thời gian đã tạo: Th1 10, 2024 lúc 09:30 AM
 -- Phiên bản máy phục vụ: 10.4.28-MariaDB
 -- Phiên bản PHP: 8.0.28
 
@@ -83,6 +83,33 @@ CREATE TABLE `services` (
 -- --------------------------------------------------------
 
 --
+-- Cấu trúc bảng cho bảng `temporarycard`
+--
+
+CREATE TABLE `temporarycard` (
+  `id` int(11) NOT NULL,
+  `id_people` int(11) NOT NULL,
+  `start` datetime NOT NULL,
+  `end` datetime NOT NULL,
+  `info` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL CHECK (json_valid(`info`))
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Cấu trúc bảng cho bảng `users`
+--
+
+CREATE TABLE `users` (
+  `id` int(11) NOT NULL,
+  `username` varchar(200) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL,
+  `password` varchar(1000) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL,
+  `info` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL CHECK (json_valid(`info`))
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
 -- Cấu trúc bảng cho bảng `vehicles`
 --
 
@@ -132,6 +159,22 @@ ALTER TABLE `services`
   ADD KEY `name` (`name`);
 
 --
+-- Chỉ mục cho bảng `temporarycard`
+--
+ALTER TABLE `temporarycard`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `start` (`start`),
+  ADD KEY `end` (`end`),
+  ADD KEY `id_people` (`id_people`) USING BTREE;
+
+--
+-- Chỉ mục cho bảng `users`
+--
+ALTER TABLE `users`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `username` (`username`);
+
+--
 -- Chỉ mục cho bảng `vehicles`
 --
 ALTER TABLE `vehicles`
@@ -168,6 +211,18 @@ ALTER TABLE `services`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
+-- AUTO_INCREMENT cho bảng `temporarycard`
+--
+ALTER TABLE `temporarycard`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT cho bảng `users`
+--
+ALTER TABLE `users`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
 -- AUTO_INCREMENT cho bảng `vehicles`
 --
 ALTER TABLE `vehicles`
@@ -189,6 +244,12 @@ ALTER TABLE `bills`
 ALTER TABLE `pairapartmentpeople`
   ADD CONSTRAINT `pairapartmentpeople_ibfk_1` FOREIGN KEY (`id_apartment`) REFERENCES `apartments` (`id`) ON DELETE CASCADE,
   ADD CONSTRAINT `pairapartmentpeople_ibfk_2` FOREIGN KEY (`id_people`) REFERENCES `people` (`id`) ON DELETE CASCADE;
+
+--
+-- Các ràng buộc cho bảng `temporarycard`
+--
+ALTER TABLE `temporarycard`
+  ADD CONSTRAINT `temporarycard_ibfk_1` FOREIGN KEY (`id_people`) REFERENCES `people` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 --
 -- Các ràng buộc cho bảng `vehicles`

@@ -1,6 +1,12 @@
 from typing import Union
 from fastapi import FastAPI
 
+# import password module
+from module.password import hash_password, check_password
+
+# import module
+from module.exceptKey import *
+
 # import model
 from model.apartment import *
 from model.bill import *
@@ -8,6 +14,8 @@ from model.people import *
 from model.vehicle import *
 from model.service import *
 from model.pairapartmentpeople import *
+from model.temporarycard import *
+from model.user import *
 
 # import database
 from database import sql_insert, sql_select, sql_update, sql_delete
@@ -41,6 +49,14 @@ app = FastAPI(
         {
             "name": "pair_apartment_people",
             "description": "Pair Apartment People API"
+        },
+        {
+            "name": "temporary_card",
+            "description": "Temporary Card API"
+        },
+        {
+            "name": "user",
+            "description": "User API"
         },
     ],
     contact={
@@ -220,6 +236,91 @@ def post_pair_apartment_people(pair: PairApartmentPeople):
 @app.delete("/pair_apartment_people", tags=["pair_apartment_people"])
 def delete_pair_apartment_people(pair: PairApartmentPeople):
     return sql_delete("pairapartmentpeople", pair.dict())
+
+# Temporary Card
+@app.get("/temporary_cards", tags=["temporary_card"])
+def get_temporary_cards():
+    return sql_select("temporarycard", {"1": "1"})
+
+@app.get("/temporary_card/{id}", tags=["temporary_card"])
+
+def get_temporary_card(id: int):
+    return sql_select("temporarycard", {"id": id})
+
+@app.get("/temporary_cards_by_iduser/{id_people}", tags=["temporary_card"])
+def get_temporary_cards_by_name(id_people: int):
+    return sql_select("temporarycard", {"id_people": id_people})
+
+@app.post("/temporary_card", tags=["temporary_card"])
+def post_temporary_card(temporary_card: TemporaryCard):
+    return sql_insert("temporarycard", temporary_card.dict())
+
+@app.put("/temporary_card/{id}", tags=["temporary_card"])
+def put_temporary_card(id: int, temporary_card: TemporaryCard):
+    return sql_update("temporarycard", temporary_card.dict(), {"id": id})
+
+@app.delete("/temporary_card/{id}", tags=["temporary_card"])
+def delete_temporary_card(id: int):
+    return sql_delete("temporarycard", {"id": id})
+
+@app.post("/temporary_cards_where", tags=["temporary_card"])
+def get_temporary_cards_where(temporary_card: TemporaryCard):
+    return sql_select("temporarycard", temporary_card.dict())
+
+# User
+@app.get("/users", tags=["user"])
+def get_users():
+    return exceptKey(sql_select("users", {"1": "1"}), ["password"])
+
+@app.get("/user/{id}", tags=["user"])
+def get_user(id: int):
+    return exceptKey(sql_select("users", {"id": id}), ["password"])
+
+@app.get("/users_by_username/{username}", tags=["user"])
+def get_users_by_username(username: str):
+    return exceptKey(sql_select("users", {"username": username}), ["password"])
+
+@app.post("/user", tags=["user"])
+def post_user(user: User):
+    user.password = hash_password(user.password)
+    return sql_insert("users", user.dict())
+
+@app.put("/user/{id}", tags=["user"])
+def put_user(id: int, user: User):
+    # # Check if password is match with database
+    # list_user = sql_select("users", {"id": id})
+    # if len(list_user) == 0:
+    #     return False
+    # if not check_password(user.password, list_user[0]["password"]):
+    #     return False
+    # # Hash password
+    # user.password = hash_password(user.password)
+    return sql_update("users", exceptKey(user.dict(), ["password"]), {"id": id})
+
+@app.put("/user_change_password/{id}", tags=["user"])
+def put_user_change_password(id: int, user: UserChangePassword):
+    # Check if password is match with database
+    list_user = sql_select("users", {"id": id})
+    if len(list_user) == 0:
+        return False
+    if not check_password(user.password, list_user[0]["password"]):
+        return False
+    # Hash password
+    user.new_password = hash_password(user.new_password)
+    return sql_update("users", {"password": user.new_password}, {"id": id})
+
+@app.delete("/user/{id}", tags=["user"])
+def delete_user(id: int):
+    return sql_delete("users", {"id": id})
+
+@app.post("/user_login", tags=["user"])
+def user_login(user: UserLogin):
+    list_user = sql_select("users", {"username": user.username})
+    if len(list_user) == 0:
+        return False
+    if check_password(user.password, list_user[0]["password"]):
+        return True
+    return False
 
 # Run
 import uvicorn
