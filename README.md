@@ -11,7 +11,7 @@ pip install -r requirements.txt
 ### MySQL
 
 ```
-open xample and import managerapartments.sql file in sql folder
+open xampp and import managerapartments.sql file in sql folder
 ```
 
 ### Setup config
