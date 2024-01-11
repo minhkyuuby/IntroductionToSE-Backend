@@ -74,10 +74,10 @@ def sql_insert(table_name, dict_values):
     dict_values = format_dict_values(dict_values)
     values = tuple(dict_values.values())
     sql = auto_gen_sql_insert(table_name, dict_values)
-    mycursor.execute(sql, values)
+    mycursor.mycursor(sql, values)
     mydb.commit()
 
-    return mycursor.rowcount
+    return mycursor.lastrowid
 
 def sql_select(table_name, dict_where):
     dict_where = format_dict_wheres(dict_where)
