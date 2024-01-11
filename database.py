@@ -6,7 +6,7 @@ mydb = mysql.connector.connect(
   **ConfigDatabase
 )
 
-mycursor = mydb.cursor(buffered=True, dictionary=True)
+globalCursor = None
 
 def format_dict_values(dict_values):
     dict_values_format = {}
@@ -70,39 +70,71 @@ def auto_gen_sql_delete(table_name, dict_where):
 
     return sql
 
+# Auto reconnect to database if not connected
+def sql_reconnect(func):
+    def wrapper(*args, **kwargs):
+        try:
+            mydb.ping()
+        except:
+            mydb.reconnect()
+        return func(*args, **kwargs)
+    return wrapper
+
+# Auto create mydb cursor
+def sql_open_cursor(func):
+    global globalCursor
+    def wrapper(*args, **kwargs):
+        global globalCursor
+        try:
+            globalCursor.close()
+        except:
+            pass
+        globalCursor = mydb.cursor(buffered=True, dictionary=True)
+        return func(*args, **kwargs)
+    return wrapper
+
+@sql_reconnect
+@sql_open_cursor
 def sql_insert(table_name, dict_values):
+    
     dict_values = format_dict_values(dict_values)
     values = tuple(dict_values.values())
     sql = auto_gen_sql_insert(table_name, dict_values)
-    mycursor.execute(sql, values)
+    globalCursor.execute(sql, values)
     mydb.commit()
 
-    return mycursor.lastrowid
+    return globalCursor.lastrowid
 
+@sql_reconnect
+@sql_open_cursor
 def sql_select(table_name, dict_where):
     dict_where = format_dict_wheres(dict_where)
     values = tuple(dict_where.values())
     sql = auto_gen_sql_select(table_name, dict_where)
-    mycursor.execute(sql, values)
-    myresult = mycursor.fetchall()
+    globalCursor.execute(sql, values)
+    myresult = globalCursor.fetchall()
 
     return myresult
 
+@sql_reconnect
+@sql_open_cursor
 def sql_update(table_name, dict_values, dict_where):
     dict_values = format_dict_values(dict_values)
     dict_where = format_dict_wheres(dict_where)
     values = tuple(dict_values.values()) + tuple(dict_where.values())
     sql = auto_gen_sql_update(table_name, dict_values, dict_where)
-    mycursor.execute(sql, values)
+    globalCursor.execute(sql, values)
     mydb.commit()
     
-    return mycursor.rowcount
+    return globalCursor.rowcount
 
+@sql_reconnect
+@sql_open_cursor
 def sql_delete(table_name, dict_where):
     dict_where = format_dict_wheres(dict_where)
     values = tuple(dict_where.values())
     sql = auto_gen_sql_delete(table_name, dict_where)
-    mycursor.execute(sql, values)
+    globalCursor.execute(sql, values)
     mydb.commit()
 
-    return mycursor.rowcount
+    return globalCursor.rowcount
