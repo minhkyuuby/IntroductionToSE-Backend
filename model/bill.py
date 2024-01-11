@@ -7,8 +7,10 @@ class BillService(BaseModel):
     price: Union[float, None] = None
     status: Union[int, None] = None
     note: Union[str, None] = None
+    quantity: Union[int, None] = None
 
 class BillInfo(BaseModel):
+    title: Union[str, None] = None
     list_service: Union[List[BillService], None] = None
     note: Union[str, None] = None
 
