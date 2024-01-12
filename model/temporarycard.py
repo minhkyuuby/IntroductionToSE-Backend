@@ -22,7 +22,8 @@ class TemporaryCard(BaseModel):
                     "end": "2021-01-01 00:00:00",
                     "info": {
                         "note": "Temporary card"
-                    }
+                    },
+                    "type": "0 == Temporary absentee ballot, 1 == Temporary residence card"
                 }
             ]
         }
