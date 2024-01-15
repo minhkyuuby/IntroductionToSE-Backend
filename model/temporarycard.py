@@ -2,6 +2,7 @@ from pydantic import BaseModel
 from typing import Any, Union
 
 class TemporaryCardInfo(BaseModel):
+    paperId: Union[str, None] = None
     residentId: Union[str, None] = None
     fullname: Union[str, None] = None
     note: Union[str, None] = None
