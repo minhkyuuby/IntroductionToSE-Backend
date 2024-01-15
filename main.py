@@ -1,5 +1,6 @@
 from typing import Union
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 
 # import password module
 from module.password import hash_password, check_password
@@ -67,6 +68,14 @@ app = FastAPI(
         "name": "Apache 2.0",
         "identifier": "MIT",
     },
+)
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
 
 # Apartment
